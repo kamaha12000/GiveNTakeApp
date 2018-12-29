@@ -4,7 +4,7 @@ namespace GiveNTake.Model
 {
     public class User
     {
-        public int UserId { get; set; }
+        public string Id { get; set; }
         public IList<Product> Products { get; set; }
     }
 }

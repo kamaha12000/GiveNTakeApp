@@ -26,6 +26,7 @@ namespace GiveNTake
                 try
                 {
                     context.Database.Migrate();
+                    context.SeedData();
                 }
                 catch(Exception ex)
                 {
