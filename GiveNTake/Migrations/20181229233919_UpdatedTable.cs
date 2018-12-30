@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GiveNTake.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class UpdatedTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Category",
+                name: "Categories",
                 columns: table => new
                 {
                     CategoryId = table.Column<int>(nullable: false)
@@ -19,11 +19,11 @@ namespace GiveNTake.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Category", x => x.CategoryId);
+                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
                     table.ForeignKey(
-                        name: "FK_Category_Category_ParentCategoryCategoryId",
+                        name: "FK_Categories_Categories_ParentCategoryCategoryId",
                         column: x => x.ParentCategoryCategoryId,
-                        principalTable: "Category",
+                        principalTable: "Categories",
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -45,12 +45,11 @@ namespace GiveNTake.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                    Id = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -59,10 +58,11 @@ namespace GiveNTake.Migrations
                 {
                     ProductId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    OwnerUserId = table.Column<int>(nullable: true),
+                    OwnerId = table.Column<string>(nullable: false),
                     Title = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     CategoryId = table.Column<int>(nullable: true),
+                    SubCategoryCategoryId = table.Column<int>(nullable: true),
                     CityId = table.Column<int>(nullable: true),
                     PublishDate = table.Column<DateTime>(nullable: false)
                 },
@@ -70,9 +70,9 @@ namespace GiveNTake.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_Products_Category_CategoryId",
+                        name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Category",
+                        principalTable: "Categories",
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -82,10 +82,16 @@ namespace GiveNTake.Migrations
                         principalColumn: "CityId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Products_Users_OwnerUserId",
-                        column: x => x.OwnerUserId,
+                        name: "FK_Products_Users_OwnerId",
+                        column: x => x.OwnerId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Products_Categories_SubCategoryCategoryId",
+                        column: x => x.SubCategoryCategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -95,8 +101,8 @@ namespace GiveNTake.Migrations
                 {
                     MessageId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    FromUserUserId = table.Column<int>(nullable: true),
-                    ToUserUserId = table.Column<int>(nullable: true),
+                    FromUserId = table.Column<string>(nullable: true),
+                    ToUserId = table.Column<string>(nullable: true),
                     ProductId = table.Column<int>(nullable: true),
                     Title = table.Column<string>(nullable: true),
                     body = table.Column<string>(nullable: true)
@@ -105,10 +111,10 @@ namespace GiveNTake.Migrations
                 {
                     table.PrimaryKey("PK_Messages", x => x.MessageId);
                     table.ForeignKey(
-                        name: "FK_Messages_Users_FromUserUserId",
-                        column: x => x.FromUserUserId,
+                        name: "FK_Messages_Users_FromUserId",
+                        column: x => x.FromUserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Messages_Products_ProductId",
@@ -117,10 +123,10 @@ namespace GiveNTake.Migrations
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Messages_Users_ToUserUserId",
-                        column: x => x.ToUserUserId,
+                        name: "FK_Messages_Users_ToUserId",
+                        column: x => x.ToUserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -145,14 +151,14 @@ namespace GiveNTake.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Category_ParentCategoryCategoryId",
-                table: "Category",
+                name: "IX_Categories_ParentCategoryCategoryId",
+                table: "Categories",
                 column: "ParentCategoryCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_FromUserUserId",
+                name: "IX_Messages_FromUserId",
                 table: "Messages",
-                column: "FromUserUserId");
+                column: "FromUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ProductId",
@@ -160,9 +166,9 @@ namespace GiveNTake.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_ToUserUserId",
+                name: "IX_Messages_ToUserId",
                 table: "Messages",
-                column: "ToUserUserId");
+                column: "ToUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductMedia_ProductId",
@@ -180,9 +186,14 @@ namespace GiveNTake.Migrations
                 column: "CityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_OwnerUserId",
+                name: "IX_Products_OwnerId",
                 table: "Products",
-                column: "OwnerUserId");
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_SubCategoryCategoryId",
+                table: "Products",
+                column: "SubCategoryCategoryId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -197,7 +208,7 @@ namespace GiveNTake.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Category");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Cities");

@@ -93,6 +93,8 @@ namespace GiveNTake.Migrations
 
                     b.Property<DateTime>("PublishDate");
 
+                    b.Property<int?>("SubCategoryCategoryId");
+
                     b.Property<string>("Title");
 
                     b.HasKey("ProductId");
@@ -102,6 +104,8 @@ namespace GiveNTake.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("SubCategoryCategoryId");
 
                     b.ToTable("Products");
                 });
@@ -169,6 +173,10 @@ namespace GiveNTake.Migrations
                         .WithMany("Products")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GiveNTake.Model.Category", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryCategoryId");
                 });
 
             modelBuilder.Entity("GiveNTake.Model.ProductMedia", b =>

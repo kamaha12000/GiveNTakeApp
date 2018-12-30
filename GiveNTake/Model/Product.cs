@@ -14,8 +14,6 @@ namespace GiveNTake.Model
         public User Owner { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-
-
         //Navigation properties - represent relationships
         public Category Category { get; set; }
         public City City { get; set;}

@@ -78,6 +78,43 @@ namespace GiveNTake.Model
                     new User() { Id = "buyer2@buyer2.com" });
                 SaveChanges();
             }
+
+            if (!Products.Any())
+            {
+                Products.AddRange(
+                    new Product
+                    {
+                        Owner = Users.SingleOrDefault(u => u.Id == "seller1@seller.com"),
+                        Title = "Frigidaire",
+                        Description =@"This classic top freezer refrigerator from Frigidaire is an excellent piece 
+                                        for a starter kitchen. The Store-More™ door shelves featuring gallon storage offer plenty of 
+                                            room for condiments and drinks.",
+                        Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
+                        City = Cities.SingleOrDefault(c => c.Name == "San Francisco"),
+                        PublishDate = DateTime.Now
+                    },
+                    new Product
+                    {
+                        Owner = Users.SingleOrDefault(u => u.Id == "seller2@seller.com"),
+                        Title = "Dyson V8 Absolute vacuum cleaner",
+                        Description = @"The Dyson V8 Absolute vacuum cleaner has a soft roller cleaner head for 
+                                            hard floors and a motorized cleaner head to remove dirt from carpets. In nickel/iron.",
+                        Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
+                        City = Cities.SingleOrDefault(c => c.Name == "Seattle"),
+                        PublishDate = DateTime.Now
+                    },
+                    new Product
+                    {
+                        Owner = Users.SingleOrDefault(u => u.Id == "buyer2@buyer2.com"),
+                        Title = "Whirlpool",
+                        Description = @"1.7 cu. ft. Over the Range Microwave in Stainless Steel with Electronic Touch Controls",
+                        Category = Categories.SingleOrDefault(c => c.Name == "Microwaves"),
+                        City = Cities.SingleOrDefault(c => c.Name == "New York"),
+                        PublishDate = DateTime.Now
+                    }
+                    );
+                SaveChanges();
+            }
         }
     }
 }
