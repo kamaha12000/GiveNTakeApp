@@ -34,8 +34,16 @@ namespace GiveNTake.Controllers
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(city => city.CityId));
 
             cfg.CreateMap<ProductMedia, MediaDTO>();
-                
+
+                cfg.CreateMap<Category, CategoryDTO>();
+
+                cfg.CreateMap<Category, SubCategoryDTO>();
             });
+
+
+            
+
+
 
             _productsMapper = config.CreateMapper();
         }
@@ -117,6 +125,16 @@ namespace GiveNTake.Controllers
                 new { productId = product.ProductId }, 
                 _productsMapper.Map<ProductDTO>(product)
                 );
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<CategoryDTO[]>> GetCategoriesAsync()
+        {
+            var categories = await _context.Categories
+                                .Where(c => c.ParentCategory == null)
+                                .Include(c => c.SubCategories)
+                                .ToArrayAsync();
+            return _productsMapper.Map<CategoryDTO[]>(categories);
         }
 
         [HttpGet("searchcategory/{category}/{subcategory=all}/")]
