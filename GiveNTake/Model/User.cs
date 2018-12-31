@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace GiveNTake.Model
 {
-    public class User
+    public class User : IdentityUser
     {
-        public string Id { get; set; }
         public IList<Product> Products { get; set; }
     }
 }

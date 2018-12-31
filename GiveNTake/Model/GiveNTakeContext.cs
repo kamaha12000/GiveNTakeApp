@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GiveNTake.Model
 {
-    public class GiveNTakeContext : DbContext
+    public class GiveNTakeContext : IdentityDbContext<User>
     {
         public GiveNTakeContext(DbContextOptions<GiveNTakeContext> options) : base(options)
         {
@@ -16,7 +17,6 @@ namespace GiveNTake.Model
         public DbSet<Message> Messages { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,7 +41,7 @@ namespace GiveNTake.Model
                 .WithMany();
             modelBuilder.Entity<Message>().HasOne(m => m.ToUser)
                 .WithMany();
-
+            base.OnModelCreating(modelBuilder);
         }
 
         public void SeedData()
@@ -79,42 +79,42 @@ namespace GiveNTake.Model
                 SaveChanges();
             }
 
-            if (!Products.Any())
-            {
-                Products.AddRange(
-                    new Product
-                    {
-                        Owner = Users.SingleOrDefault(u => u.Id == "seller1@seller.com"),
-                        Title = "Frigidaire",
-                        Description =@"This classic top freezer refrigerator from Frigidaire is an excellent piece 
-                                        for a starter kitchen. The Store-More™ door shelves featuring gallon storage offer plenty of 
-                                            room for condiments and drinks.",
-                        Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
-                        City = Cities.SingleOrDefault(c => c.Name == "San Francisco"),
-                        PublishDate = DateTime.Now
-                    },
-                    new Product
-                    {
-                        Owner = Users.SingleOrDefault(u => u.Id == "seller2@seller.com"),
-                        Title = "Dyson V8 Absolute vacuum cleaner",
-                        Description = @"The Dyson V8 Absolute vacuum cleaner has a soft roller cleaner head for 
-                                            hard floors and a motorized cleaner head to remove dirt from carpets. In nickel/iron.",
-                        Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
-                        City = Cities.SingleOrDefault(c => c.Name == "Seattle"),
-                        PublishDate = DateTime.Now
-                    },
-                    new Product
-                    {
-                        Owner = Users.SingleOrDefault(u => u.Id == "buyer2@buyer2.com"),
-                        Title = "Whirlpool",
-                        Description = @"1.7 cu. ft. Over the Range Microwave in Stainless Steel with Electronic Touch Controls",
-                        Category = Categories.SingleOrDefault(c => c.Name == "Microwaves"),
-                        City = Cities.SingleOrDefault(c => c.Name == "New York"),
-                        PublishDate = DateTime.Now
-                    }
-                    );
-                SaveChanges();
-            }
+            //if (!Products.Any())
+            //{
+            //    Products.AddRange(
+            //        new Product
+            //        {
+            //            Owner = Users.SingleOrDefault(u => u.Id == "seller1@seller.com"),
+            //            Title = "Frigidaire",
+            //            Description =@"This classic top freezer refrigerator from Frigidaire is an excellent piece 
+            //                            for a starter kitchen. The Store-More™ door shelves featuring gallon storage offer plenty of 
+            //                                room for condiments and drinks.",
+            //            Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
+            //            City = Cities.SingleOrDefault(c => c.Name == "San Francisco"),
+            //            PublishDate = DateTime.Now
+            //        },
+            //        new Product
+            //        {
+            //            Owner = Users.SingleOrDefault(u => u.Id == "seller2@seller.com"),
+            //            Title = "Dyson V8 Absolute vacuum cleaner",
+            //            Description = @"The Dyson V8 Absolute vacuum cleaner has a soft roller cleaner head for 
+            //                                hard floors and a motorized cleaner head to remove dirt from carpets. In nickel/iron.",
+            //            Category = Categories.SingleOrDefault(c => c.Name == "Appliances"),
+            //            City = Cities.SingleOrDefault(c => c.Name == "Seattle"),
+            //            PublishDate = DateTime.Now
+            //        },
+            //        new Product
+            //        {
+            //            Owner = Users.SingleOrDefault(u => u.Id == "buyer2@buyer2.com"),
+            //            Title = "Whirlpool",
+            //            Description = @"1.7 cu. ft. Over the Range Microwave in Stainless Steel with Electronic Touch Controls",
+            //            Category = Categories.SingleOrDefault(c => c.Name == "Microwaves"),
+            //            City = Cities.SingleOrDefault(c => c.Name == "New York"),
+            //            PublishDate = DateTime.Now
+            //        }
+            //        );
+            //    SaveChanges();
+            //}
         }
     }
 }
