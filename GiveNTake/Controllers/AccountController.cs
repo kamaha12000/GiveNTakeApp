@@ -35,11 +35,6 @@ namespace GiveNTake.Controllers
             _signInManager = signInManager;
             _configuration = configuration;
         }
-        // GET: /<controller>/
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         [AllowAnonymous]
         [HttpPost("register")]
@@ -51,6 +46,13 @@ namespace GiveNTake.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(registration.Email);
+
+            if (registration.Email.Contains("admin"))
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+
+            await _userManager.AddClaimAsync(user, new Claim("registration-date", DateTime.UtcNow.ToString("yy-MM-dd")));
             if (user != null)
             {
                 SerializableError serializableError = new SerializableError { { nameof(registration.Email), "Email already exist in the system" } };
@@ -89,14 +91,26 @@ namespace GiveNTake.Controllers
             }
 
             User user = await _userManager.FindByEmailAsync(login.Email);
-            JwtSecurityToken token = GenerateTokenAsync(user);  //defined
+            JwtSecurityToken token = await GenerateTokenAsync(user);  //defined
             string serializedToken = new JwtSecurityTokenHandler().WriteToken(token);
             return Ok(new SuccessfulLoginResult() { Token = serializedToken });
         }
 
-        private JwtSecurityToken GenerateTokenAsync(User user)
+        private async Task<JwtSecurityToken> GenerateTokenAsync(User user)
         {
-            var claims = new List<Claim>();      //Loading user Claims
+            var claims = new List<Claim>() {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName)
+            };
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
 
             var expirationDays = _configuration.GetValue<int>("JWTConfiguration:TokenExpirationDays");
             var signingKey = Encoding.UTF8.GetBytes(_configuration.GetValue<string>("JWTConfiguration:SigningKey"));
@@ -109,6 +123,13 @@ namespace GiveNTake.Controllers
                 );
 
             return token;
+        }
+
+        [Authorize]
+        [HttpGet("Email")]
+        public ActionResult<string> GetEmail()
+        {
+            return Ok(User.Identity.Name);
         }
     }
 }

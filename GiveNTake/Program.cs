@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GiveNTake.Model;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,11 +23,13 @@ namespace GiveNTake
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetService<GiveNTakeContext>();
+                var roleManager = services.GetService<RoleManager<IdentityRole>>();
 
                 try
                 {
                     context.Database.Migrate();
                     context.SeedData();
+                    context.SeedRolesAsync(roleManager).Wait();
                 }
                 catch (Exception)
                 {

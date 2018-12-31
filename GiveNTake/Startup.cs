@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GiveNTake.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +33,12 @@ namespace GiveNTake
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(
+                config =>
+                {
+                    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                    config.Filters.Add(new AuthorizeFilter(policy));
+                });
             services.AddDbContext<GiveNTakeContext>(options => options.UseSqlServer(Configuration.GetConnectionString("GiveNTakeDB")));
             services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<GiveNTakeContext>()
                 .AddDefaultTokenProviders();
@@ -52,6 +60,21 @@ namespace GiveNTake
                 };
             });
 
+            services.AddAuthorization(options => options.AddPolicy("ExperiencedUser", (AuthorizationPolicyBuilder policy) =>
+            {
+                policy.RequireAssertion(context =>
+                {
+                    var registrationClaimValue = context.User.Claims.SingleOrDefault(c => c.Type == "registration-date")?.Value;
+                    if (DateTime.TryParseExact(registrationClaimValue, "yy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var registrationTime))
+                    {
+                        return registrationTime.AddYears(1) < DateTime.UtcNow;
+                    }
+                    return false;
+                });
+            }));
+
+            services.AddCors();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +84,13 @@ namespace GiveNTake
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseDefaultFiles();
+            app.UseCors(b =>
+            {
+                b.AllowAnyHeader();
+                b.AllowAnyOrigin();
+                b.AllowAnyMethod();
+            });
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc(routes =>

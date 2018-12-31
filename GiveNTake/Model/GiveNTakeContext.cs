@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -115,6 +116,16 @@ namespace GiveNTake.Model
             //        );
             //    SaveChanges();
             //}
+        }
+
+
+        public async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+        {
+            if(!await roleManager.RoleExistsAsync("Admin"))
+            {
+                var admin = new IdentityRole("Admin");
+                await roleManager.CreateAsync(admin);
+            }
         }
     }
 }

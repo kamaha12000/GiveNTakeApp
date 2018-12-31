@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GiveNTake.Model;
 using GiveNTake.Model.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,9 +47,9 @@ namespace GiveNTake.Controllers
         {
             _context = context;
         }
-
-       [HttpGet]
-       [HttpGet("all")]
+        [AllowAnonymous]
+        [HttpGet]
+        [HttpGet("all")]
         public async Task<ActionResult<ProductDTO[]>> GetProducts()
         {
             var products = await _context.Products
@@ -60,6 +61,7 @@ namespace GiveNTake.Controllers
             return _productsMapper.Map<ProductDTO[]>(products);
         }
 
+        [AllowAnonymous]
         [HttpGet("{productId}")]
         public async Task<ActionResult<ProductDTO>> GetProduct(int productId)
         {
@@ -79,6 +81,7 @@ namespace GiveNTake.Controllers
             return _productsMapper.Map<ProductDTO>(product);
         }
 
+        
         [HttpPost("")]
         public async Task<ActionResult<ProductDTO>> AddNewProduct([FromBody] NewProductDTO newProductDTO)
         {
@@ -101,10 +104,10 @@ namespace GiveNTake.Controllers
             {
                 return new BadRequestObjectResult("The provided category and sub category doesnt exist");
             }
-            //User owner = _context.Users.SingleOrDefault(u => u.Id == "seller1@seller.com");
+            User owner = await _context.Users.FindAsync(User.Identity.Name);
             var product = new Product()
             {
-                Owner = new Model.User(),
+                Owner = owner,
                 Title = newProductDTO.Title,
                 Description = newProductDTO.Description,
                 Category = category,
@@ -163,6 +166,8 @@ namespace GiveNTake.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         [HttpGet("categories")]
         public async Task<ActionResult<CategoryDTO[]>> GetCategoriesAsync()
         {
@@ -173,6 +178,7 @@ namespace GiveNTake.Controllers
             return _productsMapper.Map<CategoryDTO[]>(categories);
         }
 
+        [AllowAnonymous]
         [HttpGet("cities")]
         public async Task<ActionResult<string[]>> GetCities()
         {
@@ -182,6 +188,7 @@ namespace GiveNTake.Controllers
             return cities;
         }
 
+        [Authorize(Policy ="ExperiencedUser")]
         [HttpPost("categories")]
         public async Task<ActionResult> AddCategory([FromBody] NewCategoryDTO newCategoryDTO)
         {
@@ -217,6 +224,7 @@ namespace GiveNTake.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet("search/{keyword}")]
         public async Task<ActionResult<ProductDTO[]>> SearchProducts(string keyword)
         {
@@ -231,6 +239,7 @@ namespace GiveNTake.Controllers
             return _productsMapper.Map<ProductDTO[]>(products);
         }
 
+        [AllowAnonymous]
         [HttpGet("searchcategory/{category}/{subcategory=all}/")]
         public async Task<ActionResult<ProductDTO[]>> SearchByProducts(string category, string subcategory, string location = "all", bool imageOnly = false)
         {
@@ -265,6 +274,7 @@ namespace GiveNTake.Controllers
             return Ok(_productsMapper.Map<ProductDTO[]>(products));
         }
 
+        [AllowAnonymous]
         [HttpGet("search/{date:datetime}/{keyword}/")]
         public async Task<ActionResult<ProductDTO[]>> Search(DateTime date, string keyword)
         {
