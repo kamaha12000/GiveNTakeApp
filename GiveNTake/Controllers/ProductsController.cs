@@ -101,10 +101,10 @@ namespace GiveNTake.Controllers
             {
                 return new BadRequestObjectResult("The provided category and sub category doesnt exist");
             }
-            User owner = _context.Users.SingleOrDefault(u => u.Id == "seller1@seller.com");
+            //User owner = _context.Users.SingleOrDefault(u => u.Id == "seller1@seller.com");
             var product = new Product()
             {
-                Owner = owner,
+                Owner = new Model.User(),
                 Title = newProductDTO.Title,
                 Description = newProductDTO.Description,
                 Category = category,
