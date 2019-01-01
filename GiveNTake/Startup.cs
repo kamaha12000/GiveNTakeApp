@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GiveNTake.Infrastructure.ApiErrors;
 using GiveNTake.Infrastructure.CorrelationID;
 using GiveNTake.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,6 +41,7 @@ namespace GiveNTake
                 {
                     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
+                    config.Filters.Add<GlobalExceptionFilter>();
                 });
             services.AddDbContext<GiveNTakeContext>(options => options.UseSqlServer(Configuration.GetConnectionString("GiveNTakeDB")));
             services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<GiveNTakeContext>()
