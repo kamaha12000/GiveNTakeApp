@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GiveNTake.Infrastructure.CorrelationID;
 using GiveNTake.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GiveNTake
@@ -78,12 +80,16 @@ namespace GiveNTake
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            var appInsightsLogLevel = Configuration.GetValue<LogLevel>("Logging:Application Insights:LogLevel:Default");
+            loggerFactory.AddApplicationInsights(app.ApplicationServices, appInsightsLogLevel);
+            //Each response will now include a 'X-Correlation-ID' header 
+            app.UseCorrelationIdHeader();
             app.UseDefaultFiles();
             app.UseCors(b =>
             {

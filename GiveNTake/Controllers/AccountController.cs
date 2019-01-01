@@ -47,12 +47,12 @@ namespace GiveNTake.Controllers
 
             var user = await _userManager.FindByEmailAsync(registration.Email);
 
-            if (registration.Email.Contains("admin"))
-            {
-                await _userManager.AddToRoleAsync(user, "Admin");
-            }
+            //if (registration.Email.Contains("admin"))
+            //{
+            //    await _userManager.AddToRoleAsync(user, "Admin");
+            //}
 
-            await _userManager.AddClaimAsync(user, new Claim("registration-date", DateTime.UtcNow.ToString("yy-MM-dd")));
+
             if (user != null)
             {
                 SerializableError serializableError = new SerializableError { { nameof(registration.Email), "Email already exist in the system" } };
@@ -76,7 +76,8 @@ namespace GiveNTake.Controllers
                 return BadRequest(ModelState);
             }
 
-            //user = await _userManager.FindByEmailAsync(registration.Email);
+            user = await _userManager.FindByEmailAsync(registration.Email);
+            await _userManager.AddClaimAsync(user, new Claim("registration-date", DateTime.UtcNow.ToString("yy-MM-dd")));
             return Ok();
         }
 

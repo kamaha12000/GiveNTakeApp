@@ -7,6 +7,7 @@ using GiveNTake.Model.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,6 +19,7 @@ namespace GiveNTake.Controllers
     {
         private readonly GiveNTakeContext _context;
         private static readonly IMapper _productsMapper;
+        private readonly ILogger<ProductsController> _logger;
 
         static ProductsController()
         {
@@ -43,9 +45,10 @@ namespace GiveNTake.Controllers
 
             _productsMapper = config.CreateMapper();
         }
-        public ProductsController(GiveNTakeContext context)
+        public ProductsController(GiveNTakeContext context, ILogger<ProductsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         [AllowAnonymous]
         [HttpGet]
@@ -241,10 +244,11 @@ namespace GiveNTake.Controllers
 
         [AllowAnonymous]
         [HttpGet("searchcategory/{category}/{subcategory=all}/")]
-        public async Task<ActionResult<ProductDTO[]>> SearchByProducts(string category, string subcategory, string location = "all", bool imageOnly = false)
+        public async Task<ActionResult<ProductDTO[]>> SearchByCategory(string category, string subcategory, string location = "all", bool imageOnly = false)
         {
             if (string.IsNullOrEmpty(category))
             {
+                _logger.LogWarning($"An empty category was sent from the client. SubCategory: '{subcategory}', Location: '{location}'");
                 return BadRequest();
             }
 

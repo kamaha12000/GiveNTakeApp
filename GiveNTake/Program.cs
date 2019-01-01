@@ -41,6 +41,12 @@ namespace GiveNTake
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseApplicationInsights()
+                .ConfigureLogging(cfg =>
+                {
+                    cfg.AddConsole();
+                    cfg.AddDebug();
+                })
                 .UseStartup<Startup>();
     }
 }
