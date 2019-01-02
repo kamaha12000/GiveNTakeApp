@@ -46,7 +46,7 @@ namespace GiveNTake.Controllers
             }
 
             var user = await _userManager.FindByEmailAsync(registration.Email);
-            await _userManager.AddClaimAsync(user, new Claim("registration-date", DateTime.UtcNow.ToString("yy-MM-dd")));
+            
             //if (registration.Email.Contains("admin"))
             //{
             //    await _userManager.AddToRoleAsync(user, "Admin");

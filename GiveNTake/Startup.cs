@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace GiveNTake
 {
@@ -79,6 +80,15 @@ namespace GiveNTake
 
             services.AddCors();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info { Title = "GiveNTake.API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme { Name = "Authorization", In = "header" });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    {"Bearer", new string[]{ } }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -112,6 +122,16 @@ namespace GiveNTake
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
+
+            if (env.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GiveNTake.API");
+                });
+            }
+            
         }
     }
 }
