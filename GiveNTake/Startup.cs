@@ -122,15 +122,11 @@ namespace GiveNTake
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
-
-            if (env.IsDevelopment())
-            {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "GiveNTake.API");
                 });
-            }
             
         }
     }
